@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/test/create.css">
+</head>
+<body>
+    <div class="navbar">
+        <div id="teacher-name"></div>
+        <div id="test-name">
+            <input class="input" type="text">
+        </div>
+        <div id="account">
+            <div class="account-icon">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <div id="test">
+        <div id="question-bar">
+            <div id="content">
+                <div id="question-bar">
+                    <div>
+                        <p id="question-num">Q1.</p>
+                        <div id="question">
+                            <div id="audio-container"><audio id="audio-output" controls=""></audio><input id="audio-input" type="file" accept=".mp3"></div>
+                            <textarea id="question-text" class="input" style="font-size: 1.5em; width: 120%; height: 6em;" type="text"></textarea>
+                            <p>question type</p>
+                            <select id="question-type">
+                                <option value="reading" id="reading-choice">Reading</option>
+                                <option value="listening" id="listening-choice">Listening</option>
+                                <option value="writing" id="writing-choice">Writing</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="choices">
+                    <div class="choice">
+                        <div ans-id = "1">
+                            <div class="radio-button"></div>
+                        </div> 
+                        <textarea class="input"></textarea>
+                    </div>
+                    <div class="choice">
+                        <div ans-id="2">
+                            <div class="radio-button"></div>
+                        </div> 
+                        <textarea class="input"></textarea>
+                    </div>
+                    <div class="choice">
+                        <div ans-id="3">
+                            <div class="radio-button"></div>
+                        </div> 
+                        <textarea class="input"></textarea>
+                    </div>
+                    <div class="choice">
+                        <div ans-id="4">
+                            <div class="radio-button"></div>
+                        </div> 
+                        <textarea class="input"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div id="toggle">
+                <div class="button button-disabled" id="prev-button">Previous</div>
+                <div class="button" id="next-button">Next</div>
+                <div class="button" id="save-button">Save</div>
+            </div>
+        </div>
+        <div id="question-list">
+            <div id="add-question" style="background-image: url('https://cdn-icons-png.flaticon.com/128/1103/1103748.png'); background-size: 25px; background-repeat: no-repeat; background-position: center;">
+            </div>
+        </div>
+    </div>
+    <script src="../js/test/create_test.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root{
+    /* ===== Colors ===== */
+    --body-color: #fff;
+    --sidebar-color: #FFF;
+    --primary-color: #00C3E1;
+    /* --primary-color-light: #F6F5FF; */
+    --primary-color-light: #e3e3e3;
+    --toggle-color: #DDD;
+    --text-color: grey;
+
+    --border-radius: 10px;
+
+    /* ====== Transition ====== */
+    --tran-03: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.3s ease;
+    --tran-05: all 0.3s ease;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    user-select: none;
+}
+
+html,body{
+    overflow: hidden;
+}
+
+#screen{
+    display: flex;
+    height: 100vh;
+    flex-direction: row;
+}
+
+#window{
+    display: flex;
+    flex: 1;
+}
+
+#navbar{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 20px 20px 20px;
+    position: relative;
+    background-color: var(--primary-color-light);
+}
+
+#navbar-router>div{
+    color: black;
+    font-weight: 500;
+    font-size: 1.75rem;
+    border-radius: 10px;
+    margin: 25px 15px 5px 0;
+    padding: 3px 10px 3px 10px;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+#navbar-router>div:hover{
+    color: white;
+    background-color: var(--primary-color);
+}
+
+#profile{
+    align-self: flex-start;
+}
+
+.home{
+    padding: 20px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+
+.welcome-text{
+    font-size: 5rem;
+    padding: 0px 0px 0px 20px;
+    margin-top: 40px;
+}
+
+@media only screen and (max-width:1140px){
+    .welcome-text{
+        font-size: 3rem;
+        margin-top: 10px;
+    }   
+}
+
+#tasks{
+    background-color: var(--primary-color-light);
+    padding: 10px 0px 10px 10px;
+    border-radius: var(--border-radius);
+    height: 160px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 15px 0px 0px 0px;
+    font-size: large;
+    font-weight: 600;
+    width: calc();
+}
+
+.box{
+    position: relative;
+    padding: 5px;
+    margin: 5px 10px 5px 5px;
+    height: 130px;
+    width: 130px;
+    background-color: #ffffff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    border-radius: var(--border-radius);
+    font-size: large;
+    overflow: hidden;
+    box-shadow: 1px 1px 10px rgb(196, 196, 196);
+    color: rgb(65, 65, 65);
+    transition: box-shadow 0.2s ease-in-out, width 0.2s ease-in-out, height 0.2s ease-in-out, margin 0.2s ease-in-out;
+}
+
+.box:hover{
+    box-shadow: 1px 1px 10px rgb(147, 147, 147);
+}
+
+.box-remove{
+    width: 0px;
+    height: 0px;
+}
+
+.add{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--primary-color);
+    transition: background-color 0.2s ease-in-out;
+}
+
+#router{
+    width: 100%;
+    display: flex;
+    flex: 1;
+    margin: 50px 0 0 0;
+}
+
+.route-container{
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color-light);
+    flex-direction: row;
+    padding: 5px;
+    flex: 1;
+    margin: 5px 10px 5px 5px;
+}
+
+
+.quiz{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: 10px;
+    overflow-y: scroll;
+}
+
+#quiz-list{
+    display: flex;
+    flex-wrap: wrap;
+}
