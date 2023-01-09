@@ -1,14 +1,14 @@
 teacher = {
     'firstname':'Lavnish',
     'middlename':'',
-    'lastname':'Chaudhary',
+    'lastname':'',
     'tasks':[
         {
-            'title':'Finish Grading section A',  
+            'title':'Write math quiz at 1pm',  
             'id':34123
         },
         {
-            'title':'Task two',
+            'title':'AI assignment',
             'id':34124
         },
         {
@@ -17,6 +17,23 @@ teacher = {
         }
     ]
 }
+
+const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+  // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+studentId = params.id;
+
+$.get(
+    `/api/student/get?id=${studentId}`,
+    function(data, status){
+        if(status=='success'){
+            studentData = data
+            console.log(data)
+            homeWindow()
+        }
+    }
+) 
 
 var currWindow = 0
 
@@ -134,11 +151,6 @@ const quiz = `
     </div>
 </div>
 <div id="quiz-list">
-    <div class="box add" id="quiz-add">
-        <a style="color: white; width: 100%; padding: 10px 5px 0px 5px;">New Quiz</a>
-        <div style="transition: transform 0.2s ease-in-out;"><img src="/icons/plus.svg"
-                style="fill: black; width: 40px; height: 40px; margin-top: 10px;"></div>
-    </div>
 </div>
 </div>
 `
@@ -155,6 +167,7 @@ function testWindow(){
     $.get(
         '/api/tests/list',
         function(data, status){
+
             Object.keys(data.tests).forEach((test_id)=>{
 
                 const quiz = $(`<div class="box" test-id=${test_id}>${data.tests[test_id].name}</div>`)
@@ -166,7 +179,4 @@ function testWindow(){
         }
     )
 }
-
-homeWindow()
-//testWindow()
 

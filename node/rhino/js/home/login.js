@@ -2,7 +2,7 @@ var studentID = 0;
 
 document.getElementById("login").addEventListener("click", (event) => {
     (async ()=>{
-        const response = await fetch("http://localhost:8080/login-student", {
+        const response = await fetch("/api/student/login", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({

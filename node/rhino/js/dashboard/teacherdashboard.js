@@ -113,6 +113,49 @@ function homeWindow(){
 
 //e-material
 
+const material = 
+`
+<div class="material">
+<a style="font-size: 2rem; padding: 50px 0px 0px 10px; font-weight: 500;">e-material</a>
+<div class="route-container" id="resource-list" style="width: 100%; display: flex; flex-direction: row; overflow-x: scroll;">
+    <div class="box add" id="new-resource">
+        <a style="color: white; width: 100%; padding: 10px 5px 0px 5px;">New resource</a>
+        <div style="transition: transform 0.2s ease-in-out;"><img src="/icons/plus.svg"
+                style="fill: black; width: 40px; height: 40px; margin-top: 10px;"></div>
+    </div>
+</div>
+</div>
+`
+
+$('#resources').on('click',()=>{
+    if(currWindow!=2){
+        currWindow = 2;
+        resourceWindow()
+    }
+})
+
+function resourceWindow(){
+    $('#window').html(material)
+    $('#new-resource').on('click',()=>{
+        
+    })
+    $.get(
+        '/api/resource/list',
+        function(data, status){
+            console.log(data)
+            Object.keys(data.resources).forEach((resourceId)=>{
+
+                let resourceBox = $(`<div class="box" resource-id=${resourceId}>${data.resources[resourceId].name}</div>`)
+                .on('click', ()=>{
+                    console.log(resourceId)
+                    window.open(`/resource/create?resourceId=${resourceId}`)
+                })
+                $('#resource-list').append(resourceBox)
+            })
+        }
+    )
+}
+
 //grading
 
 //tests
@@ -158,14 +201,14 @@ function testWindow(){
                 if(status=='success'){
                     $('#quiz-list').children().slice(1).remove()
 
-                    Object.keys(data.tests).forEach((test_id)=>{
-                        console.log(test_id)
-                        $('#quiz-list')
-                        .append(`<div class="box" test-id=${test_id}>${data.tests[test_id].name}</div>`)
-                        .on('click', ()=>{
-                            window.open(`/tests/create?testId=${test_id}`)
-                        })
-                    }) 
+                    // Object.keys(data.tests).forEach((test_id)=>{
+                    //     console.log(test_id)
+                    //     $('#quiz-list')
+                    //     .append(`<div class="box" test-id=${test_id}>${data.tests[test_id].name}</div>`)
+                    //     .on('click', ()=>{
+                    //         window.open(`/tests/create?testId=${test_id}`)
+                    //     })
+                    // }) 
 
                     window.open(xhr.getResponseHeader('Location'))  
                 }

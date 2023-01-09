@@ -23,8 +23,6 @@ $.get(
         'testId':test_ID
     },
     (data, response)=>{
-
-        console.log(data)
         outputQuestions = data.questions
         outputAnswers = data.answers
 
@@ -32,6 +30,8 @@ $.get(
             addQuestion(0)
             return
         }
+
+        console.log(data)
 
         outputQuestions.questions.forEach((questionData, index)=>{
             addQuestion(index, exists=true)
@@ -93,7 +93,7 @@ $('.choice-textarea').each((index,textarea)=>{
 // '+' add question button
 $('#question-add-button').on('click',(event)=>{
     saveQuestion()
-    addQuestion(outputQuestions.questions.length, $('#question-content').attr('question-type'));
+    addQuestion(outputQuestions.questions.length, exists = false);
     buttonState(outputQuestions.questions.length)
 })
 
@@ -184,11 +184,11 @@ function addQuestion(index, exists){
 //set form
 function getQuestion(questionId){
 
-
-
     const index = parseInt(questionId)
     const questionData = outputQuestions.questions[index]
     const answerType = questionData.answerType
+    const questionType = questionData.questionType
+
     $('#question-text').val(questionData.question);
     $('#question-content').attr("question-id", questionId);
     $('#question-type-select').val(questionData.questionType).change()
@@ -197,12 +197,14 @@ function getQuestion(questionId){
     $($('.option')[outputAnswers[questionId]]).trigger('click').change()
     $('.choice')[outputAnswers[questionId]].scrollIntoView({behavious:"smooth"})
 
-    console.log(outputAnswers[questionId])
-
     if(answerType=='choice'){
         $('.choice-textarea').each((i, element)=>{
             element.value = questionData.choices[i]
         })
+    }
+
+    if(questionType == 'listening'){
+        $('#audio-input').src = outputQuestions.questions[index].audiosrc ? new Audio(outputQuestions.questions[index].audiosrc) : audio_files[questionId]
     }
 }
 
@@ -211,7 +213,7 @@ function saveQuestion(){
     const index = parseInt($('#question-content').attr('question-id'))
     const questionType = $('#question-content').attr('question-type')
     const answerType = $('#question-content').attr('answer-type')
-
+    console.log(index)
     outputQuestions.questions[index].question=$('#question-text').val()
     outputQuestions.questions[index]['questionType']= questionType
     outputQuestions.questions[index]['answerType']= answerType
@@ -225,6 +227,10 @@ function saveQuestion(){
         })
     }
 
+    if(questionType=='listening'){
+        outputQuestions.questions[index].audiosrc = document.getElementById("audio-input").files[0]
+        addFile(document.getElementById("audio-input").files[0],$('#question-content').attr('question-id'))
+    }
 
     return index+1
 }
@@ -234,9 +240,15 @@ audio_files = {}
 //audio files, upload to server in the end [TODO]
 document.getElementById("audio-input").addEventListener("change", (event) => {
     const audio = event.target.files[0]
-    audio_files[$('#question-content').attr('question-id')] = audio    
+    addFile(audio, $('#question-content').attr('question-id'))
     document.getElementById('audio-output').src = URL.createObjectURL(audio)
 })
+
+//add audio files
+function addFile(audio, questionId){
+    //[TODO] group same audio into one audio=>[001,002,003]
+    audio_files[questionId] = audio
+}
 
 //next question button
 $('#next-button').click((event)=>{
@@ -244,7 +256,7 @@ $('#next-button').click((event)=>{
     nextIndex = parseInt($('#question-content').attr('question-id')) + 1
     if(nextIndex>=outputQuestions.questions.length){
         buttonState(nextIndex)
-        addQuestion(nextIndex)
+        addQuestion(nextIndex, exists = false)
     }
     else{
         getQuestion((nextIndex).toLocaleString('en-US', {minimumIntegerDigits: 3, useGrouping:false}))
@@ -255,7 +267,7 @@ $('#next-button').click((event)=>{
 //previous question button
 $('#prev-button').click((event)=>{
     nextIndex = parseInt($('#question-content').attr('question-id'))
-    console.log(nextIndex)
+
     if(nextIndex <= 0){
         return
     } 
@@ -336,6 +348,12 @@ $('#save-button-final').on('click',()=>{
     outputQuestions.metadata.test_passing = $('#test-passing').val()
     outputQuestions.metadata.description = $('#test-description').val()
 
+    for(var i = 0; i<outputQuestions.questions.length; i++){
+        if(outputQuestions.questions[i].questionType == 'listening'){
+            outputQuestions.questions[i].audiosrc = `/tests/audio/${test_ID}-${outputQuestions.questions[i].id}`
+        }
+    }
+
     fetch('/api/tests/save', {
         method : 'POST',
         headers:{
@@ -347,6 +365,16 @@ $('#save-button-final').on('click',()=>{
             'testId':test_ID,
             'testName':outputQuestions.metadata.test_name
         }),
+    })
+
+    Object.keys(audio_files).forEach((questionId)=>{
+        const formData = new FormData()
+        formData.append('name',`${test_ID}-${questionId}`)
+        formData.append('file',audio_files[questionId])
+        fetch('/api/tests/audio/upload', {
+            method : 'POST',
+            body:formData,
+        })
     })
 })
 

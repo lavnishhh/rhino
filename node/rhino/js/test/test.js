@@ -1,25 +1,23 @@
 var current_question = 0
+const test_ID = new URLSearchParams(window.location.search).get('testId'),
+pl = $('#audio-play-button')
 
 $.get(
-    '/api/tests/list',
+    `/api/student/tests/get`,
+    {
+        testId: test_ID,
+    },
     function(data, status){
-        $.get(
-            `/api/student/tests/get`,
-            {
-                testId: Object.keys(data['tests'])[0],
-            },
-            function(data, status){
-                if(status=='success'){
-                    test = data['questions']
-                    initializeTest()
-                    current_question = 0
-                    setForm(question_map[current_question])
-                    updateButtonStatus()
-                }
-            }
-        )        
-    }   
-)
+        if(status=='success'){
+            test = data['questions']
+            console.log(data)
+            initializeTest()
+            current_question = 0
+            setForm(question_map[current_question])
+            updateButtonStatus()
+        }
+    }
+) 
 
 const answers = {
     metadata: {},
@@ -82,22 +80,33 @@ function setForm(ques_id){
 
         if(test.questions[i].id == ques_id){
 
-            if($('#question').attr('question-type')=='listening' && test.questions[i].questionType != 'listening'){
-                audio.pause();
-                audio = null
-                clearInterval(audioLoop)
+            if(test.questions[i].answerType == 'choice'){
+                $('#choices').empty()
+
+                Object.keys(test.questions[i].choices).forEach(key => {
+                    parent = $('<div>',{
+                        class: 'choice',
+                        ans_id: key,
+                        click: (event) =>{
+                            setChoice(event.currentTarget.getAttribute('ans_id'))
+                            getForm()
+                            updateButtonStatus()
+                        }
+                    })
+
+                    ans = $(`<div class="radio-button radio-button-unselected"></div><p>${test.questions[i].choices[key]}</p>`)
+
+                    parent.append(ans).appendTo($('#choices'))
+                })
+
+                setChoice(answers.answers[ques_id].answer)
             }
 
             if(test.questions[i].answerType == 'writing'){
-
-                $('#question').attr('audio-src', null)
-
-                $('#question').empty()
                 $('#choices').empty()
 
                 $('#question').attr('answer-type', test.questions[i].answerType);
                 $('#question').attr('question-type', test.questions[i].questionType);
-                $('<p id="question-text"></p>').text('Q'+(i+1) + ' ' + test.questions[i].question).appendTo($('#question'))
 
                 $('<a>',{
                     text: 'Type your answer here',
@@ -125,68 +134,46 @@ function setForm(ques_id){
 
                 $('#question').attr('audio-src', null)
 
-                $('#question').empty()
-                $('#choices').empty()
+                $('.audio-element').css('display','none')
     
                 $('#question').attr('question-type', test.questions[i].questionType);
                 $('#question').attr('answer-type', test.questions[i].answerType);
 
-                $('<p id="question-text"></p>').text('Q'+(i+1) + ' ' + test.questions[i].question).appendTo($('#question'))
-
-                Object.keys(test.questions[i].choices).forEach(key => {
-                    parent = $('<div>',{
-                        class: 'choice',
-                        ans_id: key,
-                        click: (event) =>{
-                            setChoice(event.currentTarget.getAttribute('ans_id'))
-                            getForm()
-                            updateButtonStatus()
-                            setForm(question_map[current_question])
-                        }
-                    })
-
-                    radioButton = $('<div class="radio-button radio-button-unselected"></div>')
-
-                    answerText = $('<p>',{
-                        text: test.questions[i].question
-                    })
-
-                    parent.append(radioButton).appendTo($('#choices'))
-                    $('#choices').children().last().append(answerText)
-                })
-
-                setChoice(answers.answers[ques_id].answer)
+                $('#question-text').text('Q'+(i+1) + ' ' + test.questions[i].question)
             }
 
             if(test.questions[i].questionType == 'listening'){
 
-                if($('#question').attr('audio-src')!= test.questions[i].audiosrc){
-                    $('#question').empty()
+                audio = null
 
-                    au = document.createElement('div')
-                    au.classList.add('audio-element')
-                    pl = document.createElement('div')
-                    pl.classList.add('paused')
-                    pl.classList.add('audio-button')
+                $('.audio-element').css('display','flex')
+
+                $('#question-text').text(`Q${i+1} ${test.questions[i].question}`)
+
+                if($('#question').attr('audio-src') != test.questions[i].audiosrc){
+
                     audio = new Audio(test.questions[i].audiosrc);
+
+                    console.log(1)
+
                     audioLoop = setInterval(()=>{
                         const duration = format(Math.floor(audio.duration/60),1) + ':' + format(parseInt(audio.duration%60),2)
                         var current = format(Math.floor(audio.currentTime/60),1) + ':' + format(parseInt(audio.currentTime%60),2)
-                        tx.textContent = current+"/"+duration
+                        $('#audio-element > a').val(current+"/"+duration)
                         if(audio.duration == audio.currentTime){
                             clearInterval(audioLoop)
                         }
                     }, 500)
     
-                    pl.addEventListener('click', () => {
+                    pl.on('click', () => {
                         if(audio.paused){
                             audio.play();
-                            pl.classList.toggle('paused', false)
+                            pl.toggleClass('paused', false)
                             clearInterval(audioLoop)
                             audioLoop = setInterval(()=>{
                                 const duration = format(Math.floor(audio.duration/60),1) + ':' + format(parseInt(audio.duration%60),2)
                                 var current = format(Math.floor(audio.currentTime/60),1) + ':' + format(parseInt(audio.currentTime%60),2)
-                                tx.textContent = current+"/"+duration
+                                $('#audio-element > a').val(current+"/"+duration)
                                 if(audio.duration == audio.currentTime){
                                     clearInterval(audioLoop)
                                 }
@@ -194,7 +181,7 @@ function setForm(ques_id){
                         }
                         else{
                             audio.pause();
-                            pl.classList.toggle('paused', true)
+                            pl.toggleClass('paused', true)
                             clearInterval(audioLoop)
                         }
                     })
@@ -203,44 +190,12 @@ function setForm(ques_id){
                     $('#question').attr('question-type', test.questions[i].questionType);
                     $('#question').attr('audio-src', test.questions[i].audiosrc)
     
-                    pl.id = 'audio-play-button'
-                    tx = document.createElement('a')
-                    au.appendChild(pl)
-                    au.appendChild(tx)
                     //au.setAttribute('src', test.questions[i].question)
-                    $('#question')[0].appendChild(au)
-                    $('<p id="question-text"></p>').text('Q'+(i+1) + ' ' + test.questions[i].question).appendTo($('#question'))
                     
                 }
                 else{
                     $('#question-text').text('Q'+(i+1) + ' ' + test.questions[i].question)
                 }
-
-                $('#choices').empty()
-
-                Object.keys(test.questions[i].choices).forEach(key => {
-                    parent = $('<div>',{
-                        class: 'choice',
-                        ans_id: key,
-                        click: (event) =>{
-                            setChoice(event.currentTarget.getAttribute('ans_id'))
-                            getForm()
-                            updateButtonStatus()
-                            setForm(question_map[current_question])
-                        }
-                    })
-
-                    radioButton = $('<div class="radio-button radio-button-unselected"></div>')
-
-                    answerText = $('<p>',{
-                        text: test.questions[i].choices[key]
-                    })
-
-                    parent.append(radioButton).appendTo($('#choices'))
-                    $('#choices').children().last().append(answerText)
-                })
-
-                setChoice(answers.answers[ques_id].answer)
                 
             }
         }
@@ -350,11 +305,21 @@ function updateButtonStatus(){
         $('#ques-next').toggleClass('button-enabled',true)
 }
 function endTest(){
+    fetch('/api/student/tests/submit', {
+        method : 'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body:JSON.stringify({
+            'answers':answers,
+            'testId':test_ID,
+        }),
+    })
     $('#screen').empty()
     $('#testSubInfo').text('Test Submitted.')
     $('#end-buttons').empty()
     $('<div class="button button-enabled">Home</div>').click(()=>{
-        window.location.href = null //GO TO DASBOARD [SERVER]
+        window.location.href = '/dashboard/student'
     }).appendTo('#end-buttons')
 }
 
@@ -367,10 +332,12 @@ function finishTest(){
         if(val.answerType == 'writing' && val.answer!=-1){
             answered += 1
         }
-        else if(val.questionType == 'reading' && val.answer!=-1){
+
+        if(val.answerType == 'choice' && val.answer!=-1){
             answered += 1
         }
     })
+
     $('#n-ans').text(answered)
     $("#n-nans").text(test.questions.length - answered)
 
