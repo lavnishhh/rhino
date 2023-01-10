@@ -53,7 +53,7 @@ textarea{
 }
 
 .content-item{
-    margin: 40px 0px 20px 0px;
+    margin: 30px 0px 20px 0px;
 }
 
 .text-heading{
@@ -62,6 +62,17 @@ textarea{
     height: 3rem;
 }
 
+.text-paragraph{
+    font-weight:200;
+    font-size: 1rem;
+}
+
 .video-youtube{
     min-height: 60vh;
+}
+
+#edit{
+    position: relative; left: 50%; bottom:20px; background-color:white; border-radius:5px;
+    display: flex;
+    flex-direction: row;
 }
