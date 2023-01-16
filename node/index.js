@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 
 const multer = require('multer')
-//const mysql = require('mysql')
+const mysql = require('mysql')
 require('dotenv').config();
 
 const app = express();
@@ -26,16 +26,15 @@ const storage = multer.diskStorage({
     }
 });
 
-const students = {'9geNrCULwv':{'firstname':'Lavnish','lastname':'Chaudhary'}, '3LjkqpsW93':{'name':'Mohit','lastname':''}}
+const students = {'9geNrCULwv':{'firstname':'Lavnish','lastname':'Chaudhary'}, '3LjkqpsW93':{'name':'Mohit','lastname':'Singh'}}
 
 const upload = multer({ storage: storage })
 
-// const db = mysql.createConnection({
-//     host: 'localhost', 
-//     user: 'root',
-//     password: '',
-//     database: 'rhino'
-// })
+const db = mysql.createConnection({
+    host: 'localhost', 
+    user: 'root',
+    password: '',
+})
 
 // db.connect((err)=>{
 //     if(err){
@@ -49,8 +48,40 @@ app.listen('8080', () => {
 })
 
 app.get('/', (req, res) => {
-    res.status(200),send()
+    res.status(200).send()
 })
+
+app.get('/random', (req, res)=>{
+    res.status(200).send({
+        'id':randomString(10)
+    })
+})
+
+app.post('/api/student/register', jsonParser, function(req, res) {
+    const email = req.body.email;
+    const password = req.body.password;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const usn = req.body.usn;
+    const id = randomString(10);
+    var sql = `SELECT * FROM students WHERE email = ${email}`;
+    connection.query(sql, [email], function(err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send({
+                "info":"already registered"
+            });
+        } else {
+            var sql = `INSERT INTO students (id, email, password, name, usn) VALUES ("${id}", "${email}", "${password}", "${firstName}", "${lastName}", "${usn}")`;
+            connection.query(sql, [email, password], function(err, result) {
+                if (err) throw err;
+                res.send({
+                    "info":"registered"
+                });
+            });
+        }
+    });
+});
 
 app.post('/api/tests/create', (req, res) => {
 
@@ -197,31 +228,32 @@ app.post('/api/resource/create', (req, res) => {
 
     const resource = {
         metadata: {
-            resource_name: '',
+            resource_name: 'IELTS Tutorial',
             publish_date: '',
             professor_ID: '',
             resource_ID: resourceId,
             resource_info: '',
             description: ''
         },
-        data:[[
-            {
+        data:{
+            "000":{
                 type: 'text-heading',
                 text: 'Add heading here',
             },
-            {
+            "001":{
                 type: 'video-youtube',
                 id: '5T6zglM1Onc',
             },
-            {
+            "002":{
                 type: 'text-paragraph',
                 text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus feugiat eget lectus nec varius. Mauris at risus lorem. Morbi dictum quis purus sit amet tempor. Nulla feugiat justo vel erat scelerisque, eu commodo diam bibendum. Sed ullamcorper massa nec rhoncus vehicula. Proin egestas, metus nec vestibulum pellentesque, nunc ligula viverra quam, imperdiet varius lorem augue sed justo. Cras accumsan vestibulum orci, sit amet ullamcorper dolor elementum eu. Etiam sed accumsan ipsum, a placerat odio. Donec finibus erat quis lectus ornare, eget feugiat justo tempor. Mauris ut vestibulum magna, at malesuada neque. Etiam sit amet neque sit amet enim bibendum sodales vel eu diam. Quisque congue, urna nec tincidunt placerat, augue augue dignissim neque, nec cursus arcu est id nibh. Fusce ornare suscipit fermentum.',
             },
-            {
+            "003":{
                 type: 'quiz',
-                id: 'gDDu0Q7bcX'
+                name: 'quiz',
+                id: ''
             }
-        ]]
+        }
     }
 
     fs.writeFile(`./storage/resources/${resourceId}.json`, JSON.stringify(resource), 'utf8', function (err) {
@@ -230,8 +262,45 @@ app.post('/api/resource/create', (req, res) => {
         }
     })
 
-    res.status(200).location(`/resource/create?resourceId=${resourceId}`).send()
+    tests = {}
 
+    testItems = fs.readdirSync('./storage/tests/tests/')
+
+    testItems.forEach((test)=>{
+
+        tests[test.substring(0, test.length - 5)] = {
+            'name':JSON.parse(fs.readFileSync(`./storage/tests/tests/${test}`, 'utf8')).metadata.test_name
+        }
+
+    })
+
+    res.status(200).location(`/resource/create?resourceId=${resourceId}`).send({
+        'tests':tests
+    })
+
+})
+
+app.post('/api/resource/save', jsonParser, (req, res) => {
+
+    const id = req.body.resourceId
+
+    console.log(`saved ${id}`)
+
+    const resourceData = JSON.parse(req.body.resourceData)
+
+    //[TO-DO audio e material]
+    // for(var i; i<questionData.questions.length; i++){
+    //     if(questionData.questions[i].questionType = 'listening'){
+    //         questionData.questions[i]['audiosrc'] = `./storage/tests/audio/${id}-${questionData.questions[i].id}`
+    //     }
+    // }
+
+    fs.writeFile(`./storage/resources/${id}.json`, JSON.stringify(resourceData), 'utf8', function (err) {
+        if (err) {
+            return console.log(err);
+        }
+        res.status(200).send()
+    })
 })
 
 app.get('/api/resource/list', (req, res) => {
@@ -243,7 +312,7 @@ app.get('/api/resource/list', (req, res) => {
     contentItems.forEach((content)=>{
 
         resourceList[content.substring(0, content.length - 5)] = {
-            'name':JSON.parse(fs.readFileSync(`./storage/resources/${content}`, 'utf8')).metadata.content_name
+            'name':JSON.parse(fs.readFileSync(`./storage/resources/${content}`, 'utf8')).metadata.resource_name
         }
 
     })
@@ -266,8 +335,8 @@ app.get('/api/resource/get', (req, res) => {
             res.status(404).send({ 'error': 'error' }).end()
             return
         }
-        res.status(200).send({
-            'resource':resource
+        res.status(200).json({
+            'resource': resource
         })
     })
 

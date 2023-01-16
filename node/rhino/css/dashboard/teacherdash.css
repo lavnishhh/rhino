@@ -1,12 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root{
+    --green: #00E77F;
+    --white: #fff;
+    --theme-dark: #007AFF;
+    --theme-medium: #719ce6;
+    --theme-light: #f6fbff;
+    --light-white: rgb(202, 202, 203);
+    --black: #000000;
     /* ===== Colors ===== */
     --body-color: #fff;
     --sidebar-color: #FFF;
-    --primary-color: #00C3E1;
-    /* --primary-color-light: #F6F5FF; */
-    --primary-color-light: #e3e3e3;
     --toggle-color: #DDD;
     --text-color: grey;
 
@@ -47,7 +51,7 @@ html,body{
     justify-content: space-between;
     padding: 20px 20px 20px 20px;
     position: relative;
-    background-color: var(--primary-color-light);
+    background-color: var(--theme-light);
 }
 
 #navbar-router>div{
@@ -62,7 +66,7 @@ html,body{
 
 #navbar-router>div:hover{
     color: white;
-    background-color: var(--primary-color);
+    background-color: var(--theme-dark);
 }
 
 #profile{
@@ -91,7 +95,7 @@ html,body{
 }
 
 #tasks{
-    background-color: var(--primary-color-light);
+    background-color: var(--theme-light);
     padding: 10px 0px 10px 10px;
     border-radius: var(--border-radius);
     height: 160px;
@@ -133,10 +137,18 @@ html,body{
     height: 0px;
 }
 
+.box-container{
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    height: 240px;
+    overflow-y: scroll;
+}
+
 .add{
     display: flex;
     flex-direction: column;
-    background-color: var(--primary-color);
+    background-color: var(--theme-dark);
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -149,7 +161,7 @@ html,body{
 
 .route-container{
     border-radius: var(--border-radius);
-    background-color: var(--primary-color-light);
+    background-color: var(--theme-light);
     flex-direction: row;
     padding: 5px;
     flex: 1;
@@ -157,7 +169,7 @@ html,body{
 }
 
 
-.quiz{
+.quiz, .grading{
     display: flex;
     flex: 1;
     flex-direction: column;

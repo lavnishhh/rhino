@@ -85,7 +85,7 @@ function homeWindow(){
                 //reset 'delete/finish task' to original
                 setTimeout(()=>{
                     $('.box.add > div').css('transform','rotate(0deg)')
-                    $('.box.add').css({'background-color':'var(--primary-color)','box-shadow':''})
+                    $('.box.add').css({'background-color':'var(--theme-dark)','box-shadow':''})
                     $('.box.add > a').text('New task')
                 }, 200)
                 const rect = $('.box.add')[0].getBoundingClientRect()
@@ -116,7 +116,7 @@ function homeWindow(){
 const material = 
 `
 <div class="material">
-<a style="font-size: 2rem; padding: 50px 0px 0px 10px; font-weight: 500;">e-material</a>
+<a style="font-size: 50px; padding: 50px 0px 0px 10px; font-weight: 500;">e-material</a>
 <div class="route-container" id="resource-list" style="width: 100%; display: flex; flex-direction: row; overflow-x: scroll;">
     <div class="box add" id="new-resource">
         <a style="color: white; width: 100%; padding: 10px 5px 0px 5px;">New resource</a>
@@ -137,7 +137,22 @@ $('#resources').on('click',()=>{
 function resourceWindow(){
     $('#window').html(material)
     $('#new-resource').on('click',()=>{
-        
+        $.post(
+            '/api/resource/create',
+        function(data, status, xhr){
+            //[TODO]
+            // Object.keys(data.resources).forEach((resourceId)=>{
+
+            //     let resourceBox = $(`<div class="box" resource-id=${resourceId}>${data.resources[resourceId].name}</div>`)
+            //     .on('click', ()=>{
+            //         console.log(resourceId)
+            //         window.open(`/resource/create?resourceId=${resourceId}`)
+            //     })
+            //     $('#resource-list').append(resourceBox)
+            // })
+            window.open(xhr.getResponseHeader('Location'))  
+        }
+        )
     })
     $.get(
         '/api/resource/list',
@@ -158,31 +173,75 @@ function resourceWindow(){
 
 //grading
 
+const grading = 
+`
+<div class="grading">
+    <div style="font-size: 40px; font-weight: 500;">Grading</div>
+    <div id="router" style="margin-top: 10px; margin-bottom: 20px; max-height: 300px; min-height: 300px;">
+        <div class="route-container">
+            <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Active</a>
+            <div class="box-container" id="container-active">
+                
+            </div>
+        </div>
+        <div class="route-container">
+            <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Scheduled</a>
+        </div>
+        <div class="route-container">
+            <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Finished</a>
+        </div>
+    </div>
+</div>
+` 
+$('#grading').on('click',()=>{
+    if(currWindow!=3){
+        currWindow = 3;
+        gradingWindow()
+    }
+})
+
+function gradingWindow(){
+    $('#window').html(grading)
+    $.get(
+        '/api/tests/list',
+        function(data, status){
+            Object.keys(data.tests).forEach((test_id)=>{
+
+                const quizItem = $(`<div class="box" test-id=${test_id}>${data.tests[test_id].name}</div>`)
+                .on('click', ()=>{
+                    window.open(`/tests/grade?testId=${test_id}`)
+                })
+                $('#container-active').append(quizItem)
+            })
+        }
+    )
+}
+
 //tests
 
 const quiz = `
 <div class="quiz">
-<div style="font-size: 40px; font-weight: 500;">Quizzes</div>
-<div id="router" style="margin-top: 10px; margin-bottom: 20px; max-height: 300px; min-height: 300px;">
-    <div class="route-container">
-        <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Active</a>
-    </div>
-    <div class="route-container">
-        <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Scheduled</a>
+    <div style="font-size: 40px; font-weight: 500;">Quizzes</div>
+    <div id="router" style="margin-top: 10px; margin-bottom: 20px; max-height: 300px; min-height: 300px;">
+        <div class="route-container">
+            <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Active</a>
+        </div>
+        <div class="route-container">
+            <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Scheduled</a>
 
-    </div>
-    <div class="route-container">
-        <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Finished</a>
+        </div>
+        <div class="route-container">
+            <a style="font-size: 1.5rem; font-weight: 400; padding: 0 0 0 10px;">Finished</a>
 
+        </div>
     </div>
-</div>
-<div id="quiz-list">
-    <div class="box add" id="quiz-add">
-        <a style="color: white; width: 100%; padding: 10px 5px 0px 5px;">New Quiz</a>
-        <div style="transition: transform 0.2s ease-in-out;"><img src="/icons/plus.svg"
-                style="fill: black; width: 40px; height: 40px; margin-top: 10px;"></div>
+    <div id="quiz-list">
+        <div class="box add" id="quiz-add">
+            <a style="color: white; width: 100%; padding: 10px 5px 0px 5px;">New Quiz</a>
+            <div style="transition: transform 0.2s ease-in-out;"><img src="/icons/plus.svg"
+                    style="fill: black; width: 40px; height: 40px; margin-top: 10px;"></div>
+        </div>
     </div>
-</div>
 </div>
 `
 $('#quiz').on('click',()=>{
