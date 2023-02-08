@@ -25,12 +25,14 @@ var resourceData = {
     }
 }
 
+let teacher_id;
+
 $.get(
     `/api/resource/get?resourceId=${resourceId}`,
     (data, response) => {
         if (response = 'success') {
             resourceData = JSON.parse(data.resource)
-            console.log(resourceData)
+            teacher_id = resourceData.metadata.teacher_id
             Object.keys(resourceData.data).forEach((id) => {
                 addContent(resourceData.data[id], false, id)
             })
@@ -76,6 +78,7 @@ $.get(
                     },
                     body:JSON.stringify({
                         'resourceId':resourceId,
+                        'teacher_id':teacher_id,
                         'resourceData':JSON.stringify(resourceData)
                     }),
                 })

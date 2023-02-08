@@ -9,7 +9,7 @@
     
     <link rel="stylesheet" href="/css/dashboard/teacherdash.css">
 
-    <title>Rhino Learning Dashboard</title>
+    <title>Dashboard</title>
 </head>
 
 <body>
@@ -32,6 +32,16 @@
         <div id="window">
         </div>
         <script src="/js/dashboard/teacherdashboard.js"></script>
+    </div>
+    <div id="alert-window" style="display: none; position: absolute; width: 100vw; height: 100vh; top: 0%; background-color: rgba(255, 255, 255, 0.512);">
+        <div id="alert-box">
+            <h1 id="alert-title" style="font-weight: 600;"></h1>
+            <h3 id="alert-text" style="font-weight: 400; margin: 10px 0 0 0;"></h3>
+            <div id="alert-buttons" style="display: flex; margin: 0 0 10px 0; flex-direction: row; justify-content: space-around; flex: 1; align-items: flex-end;">
+                <div class="button button-inverted" style="width: 200px;"></div>
+                <div class="button button-inverted" style="width: 200px;"></div>
+            </div>
+        </div>
     </div>
 </body>
 

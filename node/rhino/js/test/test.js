@@ -1,12 +1,10 @@
 var current_question = 0
-const test_ID = new URLSearchParams(window.location.search).get('testId'),
+const test_ID = new URLSearchParams(window.location.search).get('test_id')
+const student_ID = new URLSearchParams(window.location.search).get('student_id')
 pl = $('#audio-play-button')
 
 $.get(
-    `/api/student/tests/get`,
-    {
-        testId: test_ID,
-    },
+    `/api/student/tests/get?testId=${test_ID}`,
     function(data, status){
         if(status=='success'){
             test = data['questions']
@@ -20,7 +18,10 @@ $.get(
 ) 
 
 const answers = {
-    metadata: {},
+    metadata: {
+        'studentid':student_ID,
+        'testid':test_ID
+    },
     answers: {
 
     }
@@ -64,7 +65,6 @@ function initializeTest(){
                 setForm(question_map[current_question])
             }
         }).appendTo('#question-list');
-
         answers.answers[test.questions[i].id] = { answerType:test.questions[i].answerType, questionType:test.questions[i].questionType ,answer:-1}
     }
 }
@@ -157,8 +157,8 @@ function setForm(ques_id){
                     console.log(1)
 
                     audioLoop = setInterval(()=>{
-                        const duration = format(Math.floor(audio.duration/60),1) + ':' + format(parseInt(audio.duration%60),2)
-                        var current = format(Math.floor(audio.currentTime/60),1) + ':' + format(parseInt(audio.currentTime%60),2)
+                        const duration = format(Math.floor(audio.duration/60),2) + ':' + format(parseInt(audio.duration%60),2)
+                        var current = format(Math.floor(audio.currentTime/60),2) + ':' + format(parseInt(audio.currentTime%60),2)
                         $('#audio-element > a').val(current+"/"+duration)
                         if(audio.duration == audio.currentTime){
                             clearInterval(audioLoop)
@@ -171,8 +171,8 @@ function setForm(ques_id){
                             pl.toggleClass('paused', false)
                             clearInterval(audioLoop)
                             audioLoop = setInterval(()=>{
-                                const duration = format(Math.floor(audio.duration/60),1) + ':' + format(parseInt(audio.duration%60),2)
-                                var current = format(Math.floor(audio.currentTime/60),1) + ':' + format(parseInt(audio.currentTime%60),2)
+                                const duration = format(Math.floor(audio.duration/60),2) + ':' + format(parseInt(audio.duration%60),2)
+                                var current = format(Math.floor(audio.currentTime/60),2) + ':' + format(parseInt(audio.currentTime%60),2)
                                 $('#audio-element > a').val(current+"/"+duration)
                                 if(audio.duration == audio.currentTime){
                                     clearInterval(audioLoop)
@@ -186,7 +186,7 @@ function setForm(ques_id){
                         }
                     })
 
-                    $('#question').attr('answerType', test.questions[i].answerType)
+                    $('#question').attr('answer-type', test.questions[i].answerType)
                     $('#question').attr('question-type', test.questions[i].questionType);
                     $('#question').attr('audio-src', test.questions[i].audiosrc)
     
@@ -319,7 +319,7 @@ function endTest(){
     $('#testSubInfo').text('Test Submitted.')
     $('#end-buttons').empty()
     $('<div class="button button-enabled">Home</div>').click(()=>{
-        window.location.href = '/dashboard/student'
+        window.location.href = `/dashboard/student?id=${student_ID}`
     }).appendTo('#end-buttons')
 }
 
